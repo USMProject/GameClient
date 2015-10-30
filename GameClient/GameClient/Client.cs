@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -8,25 +9,27 @@ namespace GameClient
     {
         private bool _isRunning = false;
         private Socket _socket;
-        private readonly int _port;
+        private int _port;
+        private UpdateManager _updateManager;
 
-        public Client(int port)
+        public Client()
         {
-            _port = port;
+            _port = 80;
+            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            _socket.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), _port));
+            _updateManager = new UpdateManager();
         }
 
         private void Run()
         {
             _isRunning = true;
-            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            _socket.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), _port));
             _socket.Listen(_port);
 
             while (_isRunning)
             {
-                //Socket connSocket = _socket.Accept();
-                //Thread thread = new Thread(() => ());
-                //thread.Start();
+                // As soon as something is heard from the socket, send to the update manager as a thread.
+                Thread thread = new Thread(() => _updateManager.IncomingStream(_socket.Accept()));
+                thread.Start();
             }
         }
 
@@ -34,6 +37,11 @@ namespace GameClient
         {
             _isRunning = false;
             _socket.Close();
+        }
+
+        public bool[,] GetMap()
+        {
+            return _updateManager.GameData.map;
         }
     }
 }
