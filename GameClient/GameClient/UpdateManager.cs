@@ -64,21 +64,25 @@ namespace GameClient
                     string line = stream.ReadLine();
 
                     // Do stuff
-                    if (line == "Initializing game")
+                    if (line == "Initializing map size")
                     {
                         InitializeMap(40, 40);
                     }
-                    else if (line == "Update players")
+                    else if (line == "Fill map")
                     {
-                        InitializePlayers();
+                        FillMap(line);
+                    }
+                    else if (line == "Init players")
+                    {
+                        InitializePlayers(line);
                     }
                     else if (line == "Update players")
                     {
-                        UpdatePlayers();
+                        UpdatePlayers(line);
                     }
                     else if (line == "Update cookies")
                     {
-                        UpdateCookies();
+                        UpdateCookies(line);
                     }
                 }
             }
@@ -94,6 +98,7 @@ namespace GameClient
             GameData.MapSizeX = sizeX;
             GameData.MapSizeY = sizeY;
             GameData.map = new bool[sizeX, sizeY];
+            GameData.players = new List<Player>();
         }
 
         private void FillMap(string binaryMap)
@@ -120,17 +125,25 @@ namespace GameClient
             }
         }
 
-        private void InitializePlayers()
+        // Init players
+        private void InitializePlayers(string s)
+        {
+            // Parse in new players
+            string[] playerParams = s.Split(',');
+            Player newGuy = new Player(playerParams[0], 
+                int.Parse(playerParams[1]), 
+                int.Parse(playerParams[2]),
+                int.Parse(playerParams[3]));
+
+            GameData.players.Add(newGuy);
+        }
+
+        private void UpdatePlayers(string line)
         {
             //
         }
 
-        private void UpdatePlayers()
-        {
-            //
-        }
-
-        private void UpdateCookies()
+        private void UpdateCookies(string line)
         {
             //
         }

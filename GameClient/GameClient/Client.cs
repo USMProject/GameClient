@@ -20,6 +20,7 @@ namespace GameClient
             _updateManager = new UpdateManager();
         }
 
+        // Runs client as a background service
         private void Run()
         {
             _isRunning = true;
@@ -33,15 +34,30 @@ namespace GameClient
             }
         }
 
-        private void Stop()
+        // Starts the client 
+        public void Start()
+        {
+            Thread thread = new Thread(Run);
+            thread.Start();
+        }
+
+        // Stops the client
+        public void Stop()
         {
             _isRunning = false;
             _socket.Close();
         }
 
+        // Gets the map
         public bool[,] GetMap()
         {
             return _updateManager.GameData.map;
+        }
+
+        // Gets the players
+        public List<Player> GetPlayers()
+        {
+            return _updateManager.GameData.players;
         }
     }
 }
